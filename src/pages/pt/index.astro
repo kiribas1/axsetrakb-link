@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VibeCheck from "../../components/VibeCheck.astro";
+import TrendingNews from "../../components/TrendingNews.astro";
+---
+
+<BaseLayout
+  title="axsetrakb - O Que Esta em Alta | Estilo de Vida, Cultura e Noticias Virais"
+  description="Sua dose diaria de noticias trending, cultura pop, moda, bem-estar e momentos virais. Descubra o que esta bombando."
+  lang="pt"
+>
+  <Fragment slot="logo">axsetrakb</Fragment>
+  <Fragment slot="footer-name">axsetrakb</Fragment>
+
+  <section class="hero">
+    <p class="hero-tag">✨ Sua Dose Diaria de Tudo que Esta em Alta</p>
+    <h1>O Que Esta em Alta Agora</h1>
+    <p>Cultura pop, moda, bem-estar, momentos virais e mais -- tudo em um so lugar. Fique por dentro!</p>
+  </section>
+
+  <div class="ad-slot">Ad Space</div>
+
+  <VibeCheck lang="pt" />
+
+  <div class="ad-slot">Ad Space</div>
+
+  <TrendingNews lang="pt" />
+
+  <div class="ad-slot">Ad Space</div>
+</BaseLayout>
+
+<style>
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 18px;
+    position: relative;
+  }
+</style>

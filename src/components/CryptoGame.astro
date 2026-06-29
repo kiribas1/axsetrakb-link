@@ -1,0 +1,298 @@
+---
+interface Props {
+  lang: string;
+}
+const { lang } = Astro.props;
+
+const labels: Record<string, Record<string, string>> = {
+  en: { title: 'Crypto Price Challenge', higher: 'Higher', lower: 'Lower', score: 'Score', best: 'Best', correct: 'Correct!', wrong: 'Wrong!', play: 'Play Again', vs: 'vs', guess: 'Will the next price be higher or lower?' },
+  es: { title: 'Desafío de Precios Crypto', higher: 'Mayor', lower: 'Menor', score: 'Puntos', best: 'Mejor', correct: '¡Correcto!', wrong: '¡Incorrecto!', play: 'Jugar de Nuevo', vs: 'vs', guess: '¿El siguiente precio será mayor o menor?' },
+  zh: { title: '加密价格挑战', higher: '更高', lower: '更低', score: '分数', best: '最佳', correct: '正确！', wrong: '错误！', play: '再玩一次', vs: '对比', guess: '下一个价格会更高还是更低？' },
+  ru: { title: 'Крипто-вызов', higher: 'Выше', lower: 'Ниже', score: 'Счёт', best: 'Лучший', correct: 'Верно!', wrong: 'Неверно!', play: 'Играть снова', vs: 'против', guess: 'Следующая цена будет выше или ниже?' },
+  pt: { title: 'Desafio de Preços Crypto', higher: 'Maior', lower: 'Menor', score: 'Pontos', best: 'Melhor', correct: 'Correto!', wrong: 'Errado!', play: 'Jogar Novamente', vs: 'vs', guess: 'O próximo preço será maior ou menor?' },
+  ar: { title: 'تحدي أسعار الكريبتو', higher: 'أعلى', lower: 'أقل', score: 'النقاط', best: 'الأفضل', correct: 'صحيح!', wrong: 'خطأ!', play: 'العب مرة أخرى', vs: 'مقابل', guess: 'هل السعر التالي سيكون أعلى أم أقل؟' },
+};
+const t = labels[lang] || labels.en;
+const tJson = JSON.stringify(t);
+---
+
+<section class="cg-section" id="crypto-game">
+  <div class="cg-container">
+    <h2 class="cg-title">{t.title}</h2>
+    <p class="cg-subtitle">🎮 Test your crypto instinct</p>
+
+    <div class="cg-arena" id="cg-arena">
+      <div class="cg-card-left" id="cg-left">
+        <div class="cg-coin-icon" id="cg-coin1"></div>
+        <div class="cg-coin-name" id="cg-name1"></div>
+        <div class="cg-price" id="cg-price1"></div>
+      </div>
+
+      <div class="cg-vs">{t.vs}</div>
+
+      <div class="cg-card-right" id="cg-right">
+        <div class="cg-coin-icon" id="cg-coin2"></div>
+        <div class="cg-coin-name" id="cg-name2"></div>
+        <div class="cg-price cg-hidden" id="cg-price2">???</div>
+      </div>
+    </div>
+
+    <p class="cg-question" id="cg-question">{t.guess}</p>
+
+    <div class="cg-buttons" id="cg-buttons">
+      <button class="cg-btn cg-btn-up" id="cg-higher" onclick="cgGuess('higher')">▲ {t.higher}</button>
+      <button class="cg-btn cg-btn-down" id="cg-lower" onclick="cgGuess('lower')">▼ {t.lower}</button>
+    </div>
+
+    <div class="cg-result cg-hidden" id="cg-result">
+      <div class="cg-result-text" id="cg-result-text"></div>
+      <a href="?" class="cg-btn cg-btn-replay" id="cg-replay">{t.play}</a>
+    </div>
+
+    <div class="cg-scores">
+      <span>{t.score}: <strong id="cg-score">0</strong></span>
+      <span>{t.best}: <strong id="cg-best">0</strong></span>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ tJson }}>
+const t = JSON.parse(tJson);
+const coins = [
+  { name: 'Bitcoin', symbol: 'BTC', icon: '₿', min: 80000, max: 160000 },
+  { name: 'Ethereum', symbol: 'ETH', icon: 'Ξ', min: 2000, max: 8000 },
+  { name: 'Solana', symbol: 'SOL', icon: '◎', min: 50, max: 400 },
+  { name: 'Cardano', symbol: 'ADA', icon: '₳', min: 0.3, max: 3 },
+  { name: 'Polkadot', symbol: 'DOT', icon: '●', min: 4, max: 40 },
+  { name: 'Avalanche', symbol: 'AVAX', icon: '▲', min: 15, max: 120 },
+  { name: 'Chainlink', symbol: 'LINK', icon: '⬡', min: 8, max: 60 },
+  { name: 'XRP', symbol: 'XRP', icon: '✕', min: 0.4, max: 4 },
+  { name: 'Dogecoin', symbol: 'DOGE', icon: 'Ð', min: 0.05, max: 0.8 },
+  { name: 'Litecoin', symbol: 'LTC', icon: 'Ł', min: 50, max: 200 },
+];
+
+let score = 0;
+let best = parseInt(localStorage.getItem('cg-best') || '0');
+let coin1, coin2, price1, price2;
+
+document.getElementById('cg-best').textContent = best;
+
+function randPrice(coin) {
+  return +(coin.min + Math.random() * (coin.max - coin.min)).toFixed(coin.min < 1 ? 4 : 2);
+}
+function formatPrice(p) {
+  return p >= 1 ? '$' + p.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '$' + p.toFixed(4);
+}
+
+function newRound() {
+  let i1 = Math.floor(Math.random() * coins.length);
+  let i2;
+  do { i2 = Math.floor(Math.random() * coins.length); } while (i2 === i1);
+  coin1 = coins[i1]; coin2 = coins[i2];
+  price1 = randPrice(coin1); price2 = randPrice(coin2);
+
+  document.getElementById('cg-coin1').textContent = coin1.icon;
+  document.getElementById('cg-name1').textContent = coin1.name + ' (' + coin1.symbol + ')';
+  document.getElementById('cg-price1').textContent = formatPrice(price1);
+  document.getElementById('cg-coin2').textContent = coin2.icon;
+  document.getElementById('cg-name2').textContent = coin2.name + ' (' + coin2.symbol + ')';
+  document.getElementById('cg-price2').textContent = '???';
+  document.getElementById('cg-price2').classList.add('cg-hidden');
+  document.getElementById('cg-buttons').classList.remove('cg-hidden');
+  document.getElementById('cg-result').classList.add('cg-hidden');
+  document.getElementById('cg-question').classList.remove('cg-hidden');
+}
+
+window.cgGuess = function(guess) {
+  const isHigher = price2 > price1;
+  const correct = (guess === 'higher' && isHigher) || (guess === 'lower' && !isHigher);
+
+  document.getElementById('cg-price2').textContent = formatPrice(price2);
+  document.getElementById('cg-price2').classList.remove('cg-hidden');
+  document.getElementById('cg-buttons').classList.add('cg-hidden');
+  document.getElementById('cg-question').classList.add('cg-hidden');
+  document.getElementById('cg-result').classList.remove('cg-hidden');
+
+  const resultText = document.getElementById('cg-result-text');
+  if (correct) {
+    score++;
+    resultText.textContent = '✅ ' + t.correct + ' +1';
+    resultText.className = 'cg-result-text cg-correct';
+    document.getElementById('cg-score').textContent = score;
+    if (score > best) {
+      best = score;
+      localStorage.setItem('cg-best', best);
+      document.getElementById('cg-best').textContent = best;
+    }
+    setTimeout(() => newRound(), 1200);
+  } else {
+    resultText.textContent = '❌ ' + t.wrong + ' ' + t.score + ': ' + score;
+    resultText.className = 'cg-result-text cg-wrong';
+    score = 0;
+    document.getElementById('cg-score').textContent = 0;
+    // Play Again reloads for ad impression
+    document.getElementById('cg-replay').style.display = 'inline-block';
+  }
+};
+
+newRound();
+</script>
+
+<style>
+  .cg-section {
+    padding: 60px 0;
+    font-family: 'Inter', -apple-system, sans-serif;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(800px 400px at 50% 0%, rgba(139,92,246,.18), transparent 60%),
+      radial-gradient(600px 350px at 20% 80%, rgba(0,240,255,.1), transparent 55%),
+      radial-gradient(500px 300px at 80% 80%, rgba(0,255,136,.08), transparent 50%),
+      linear-gradient(180deg, #0d0e14, #0a0b0f);
+    border-top: 1px solid rgba(139,92,246,.2);
+    border-bottom: 1px solid rgba(139,92,246,.2);
+  }
+  .cg-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+    position: relative;
+  }
+  .cg-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #a78bfa, #00f0ff, #00ff88);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cg-arena {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .cg-subtitle {
+    color: rgba(255,255,255,.45);
+    margin-bottom: 28px;
+    font-size: .95rem;
+  }
+  .cg-card-left, .cg-card-right {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 20px;
+    padding: 28px 32px;
+    min-width: 220px;
+    transition: all .3s;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.3);
+  }
+  .cg-card-left:hover, .cg-card-right:hover {
+    border-color: rgba(139,92,246,.3);
+    transform: scale(1.02);
+  }
+  .cg-coin-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    background: rgba(139,92,246,.1);
+    border: 1px solid rgba(139,92,246,.2);
+    border-radius: 50%;
+  }
+  .cg-coin-name {
+    font-size: .85rem;
+    color: rgba(255,255,255,.5);
+    margin-bottom: 8px;
+  }
+  .cg-price {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    transition: all .3s;
+  }
+  .cg-vs {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: rgba(139,92,246,.5);
+    text-transform: uppercase;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(139,92,246,.08);
+    border: 1px solid rgba(139,92,246,.15);
+    flex-shrink: 0;
+  }
+  .cg-question {
+    color: rgba(255,255,255,.6);
+    margin-bottom: 16px;
+    font-size: .95rem;
+  }
+  .cg-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .cg-btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .cg-btn-up {
+    background: linear-gradient(135deg, #00cc6a, #00ff88);
+    color: #0a0b0f;
+  }
+  .cg-btn-up:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,255,136,.3); }
+  .cg-btn-down {
+    background: linear-gradient(135deg, #ff3366, #ff6b6b);
+    color: #fff;
+  }
+  .cg-btn-down:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,51,102,.3); }
+  .cg-btn-replay {
+    background: linear-gradient(135deg, #00f0ff, #00ff88);
+    color: #0a0b0f;
+    margin-top: 12px;
+    display: none;
+  }
+  .cg-btn-replay:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,240,255,.3); text-decoration: none; }
+  .cg-result-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .cg-correct { color: #00ff88; }
+  .cg-wrong { color: #ff6b6b; }
+  .cg-scores {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-size: .85rem;
+    color: rgba(255,255,255,.4);
+    margin-top: 16px;
+  }
+  .cg-scores strong { color: #00f0ff; }
+  .cg-hidden { visibility: hidden; }
+  .cg-result.cg-hidden { display: none; }
+  .cg-question.cg-hidden { display: none; }
+  .cg-buttons.cg-hidden { display: none; }
+</style>

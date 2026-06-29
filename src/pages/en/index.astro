@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VibeCheck from "../../components/VibeCheck.astro";
+import TrendingNews from "../../components/TrendingNews.astro";
+---
+
+<BaseLayout
+  title="axsetrakb - What's Trending Now | Lifestyle, Culture & Viral News"
+  description="Your daily dose of trending news, pop culture, fashion, wellness, and viral moments. Discover what's hot right now."
+  lang="en"
+>
+  <Fragment slot="logo">axsetrakb</Fragment>
+  <Fragment slot="footer-name">axsetrakb</Fragment>
+
+  <section class="hero">
+    <p class="hero-tag">✨ Your Daily Dose of Everything Trending</p>
+    <h1>What's Trending Now</h1>
+    <p>Pop culture, fashion, wellness, viral moments & more -- all in one place. Stay in the loop!</p>
+  </section>
+
+  <div class="ad-slot">Ad Space</div>
+
+  <VibeCheck lang="en" />
+
+  <div class="ad-slot">Ad Space</div>
+
+  <TrendingNews lang="en" />
+
+  <div class="ad-slot">Ad Space</div>
+</BaseLayout>
+
+<style>
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 18px;
+    position: relative;
+  }
+</style>

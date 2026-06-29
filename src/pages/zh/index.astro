@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VibeCheck from "../../components/VibeCheck.astro";
+import TrendingNews from "../../components/TrendingNews.astro";
+---
+
+<BaseLayout
+  title="axsetrakb - 当下热门 | 生活方式、文化与热搜新闻"
+  description="每日热门新闻、流行文化、时尚、健康与病毒式传播时刻。发现当下最火的内容。"
+  lang="zh"
+>
+  <Fragment slot="logo">axsetrakb</Fragment>
+  <Fragment slot="footer-name">axsetrakb</Fragment>
+
+  <section class="hero">
+    <p class="hero-tag">✨ 每日热门趋势一网打尽</p>
+    <h1>当下热门话题</h1>
+    <p>流行文化、时尚、健康、病毒时刻等等 -- 尽在一处。紧跟潮流!</p>
+  </section>
+
+  <div class="ad-slot">Ad Space</div>
+
+  <VibeCheck lang="zh" />
+
+  <div class="ad-slot">Ad Space</div>
+
+  <TrendingNews lang="zh" />
+
+  <div class="ad-slot">Ad Space</div>
+</BaseLayout>
+
+<style>
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 18px;
+    position: relative;
+  }
+</style>

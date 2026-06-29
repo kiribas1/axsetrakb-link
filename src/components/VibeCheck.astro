@@ -1,0 +1,373 @@
+---
+interface Props {
+  lang: string;
+}
+const { lang } = Astro.props;
+
+const labels: Record<string, Record<string, string>> = {
+  en: {
+    title: "What's Your Vibe?",
+    subtitle: "Pick your fave in each round to discover your vibe!",
+    round: "Round",
+    of: "of",
+    orText: "or",
+    result: "Your Vibe Is...",
+    share: "Share Your Vibe!",
+    playAgain: "Play Again",
+  },
+  es: {
+    title: "Cual Es Tu Vibra?",
+    subtitle: "Elige tu favorito en cada ronda para descubrir tu vibra!",
+    round: "Ronda",
+    of: "de",
+    orText: "o",
+    result: "Tu Vibra Es...",
+    share: "Comparte Tu Vibra!",
+    playAgain: "Jugar de Nuevo",
+  },
+  zh: {
+    title: "你是什么氛围?",
+    subtitle: "在每一轮中选出你的最爱,发现你的氛围!",
+    round: "第",
+    of: "轮,共",
+    orText: "还是",
+    result: "你的氛围是...",
+    share: "分享你的氛围!",
+    playAgain: "再玩一次",
+  },
+  ru: {
+    title: "Какой Ты Вайб?",
+    subtitle: "Выбери любимое в каждом раунде и узнай свой вайб!",
+    round: "Раунд",
+    of: "из",
+    orText: "или",
+    result: "Твой Вайб...",
+    share: "Поделись Своим Вайбом!",
+    playAgain: "Играть Снова",
+  },
+  pt: {
+    title: "Qual e a Sua Vibe?",
+    subtitle: "Escolha seu favorito em cada rodada para descobrir sua vibe!",
+    round: "Rodada",
+    of: "de",
+    orText: "ou",
+    result: "Sua Vibe e...",
+    share: "Compartilhe Sua Vibe!",
+    playAgain: "Jogar Novamente",
+  },
+  ar: {
+    title: "ما هو أسلوبك؟",
+    subtitle: "اختر المفضل لديك في كل جولة لاكتشاف أسلوبك!",
+    round: "الجولة",
+    of: "من",
+    orText: "أو",
+    result: "أسلوبك هو...",
+    share: "شارك أسلوبك!",
+    playAgain: "العب مجدداً",
+  },
+};
+const t = labels[lang] || labels.en;
+const tJson = JSON.stringify(t);
+---
+
+<section class="vc-section" id="vibe-check">
+  <div class="vc-container">
+    <h2 class="vc-title">{t.title}</h2>
+    <p class="vc-subtitle">{t.subtitle}</p>
+
+    <div class="vc-progress" id="vc-progress">
+      <div class="vc-progress-bar" id="vc-progress-bar"></div>
+    </div>
+    <p class="vc-round" id="vc-round">{t.round} 1 {t.of} 5</p>
+
+    <div class="vc-options" id="vc-options">
+      <button class="vc-option vc-option-a" id="vc-opt-a" type="button">
+        <span class="vc-emoji" id="vc-emoji-a"></span>
+        <span class="vc-label" id="vc-label-a"></span>
+      </button>
+      <span class="vc-or">{t.orText}</span>
+      <button class="vc-option vc-option-b" id="vc-opt-b" type="button">
+        <span class="vc-emoji" id="vc-emoji-b"></span>
+        <span class="vc-label" id="vc-label-b"></span>
+      </button>
+    </div>
+
+    <div class="vc-result vc-hidden" id="vc-result">
+      <div class="vc-result-emoji" id="vc-result-emoji"></div>
+      <h3 class="vc-result-title" id="vc-result-title"></h3>
+      <p class="vc-result-desc" id="vc-result-desc"></p>
+      <div class="vc-result-buttons">
+        <a href="?" class="vc-btn vc-btn-share">{t.share}</a>
+        <a href="?" class="vc-btn vc-btn-again">{t.playAgain}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ tJson }}>
+const t = JSON.parse(tJson);
+
+const rounds = [
+  { category: 'fashion', a: { emoji: '👗', label: 'Vintage Thrift' }, b: { emoji: '🔥', label: 'Streetwear Heat' } },
+  { category: 'food', a: { emoji: '🍣', label: 'Sushi Date Night' }, b: { emoji: '🌮', label: 'Street Taco Run' } },
+  { category: 'travel', a: { emoji: '🏖️', label: 'Beach Vibes' }, b: { emoji: '🏔️', label: 'Mountain Escape' } },
+  { category: 'music', a: { emoji: '🎤', label: 'Pop Anthems' }, b: { emoji: '🎧', label: 'Indie Chill' } },
+  { category: 'wellness', a: { emoji: '🧘', label: 'Yoga Flow' }, b: { emoji: '💃', label: 'Dance Cardio' } },
+];
+
+const vibes = [
+  { emoji: '✨', title: 'Main Character Energy', desc: 'You walk into every room like it\'s your runway. Bold, confident, and unapologetically you!' },
+  { emoji: '🌊', title: 'Chill Vibes Only', desc: 'You\'re the calm in the chaos. Laid-back, go-with-the-flow, and effortlessly cool.' },
+  { emoji: '💅', title: 'Trendsetter', desc: 'You don\'t follow trends, you CREATE them. Fashion-forward and always ahead of the curve.' },
+  { emoji: '🔥', title: 'Hot Take Queen', desc: 'You have opinions and you\'re not afraid to share them. Fierce, bold, and totally iconic.' },
+  { emoji: '🦋', title: 'Soft Era Dreamer', desc: 'Pastel skies and cozy mornings. You\'re living your softest, most beautiful life.' },
+  { emoji: '🌈', title: 'Chaotic Good Energy', desc: 'Wild, colorful, and full of surprises. Life\'s a party and you\'re the guest of honor!' },
+];
+
+let currentRound = 0;
+let choices = [];
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const shuffledRounds = shuffle([...rounds]);
+
+function showRound() {
+  const r = shuffledRounds[currentRound];
+  document.getElementById('vc-emoji-a').textContent = r.a.emoji;
+  document.getElementById('vc-label-a').textContent = r.a.label;
+  document.getElementById('vc-emoji-b').textContent = r.b.emoji;
+  document.getElementById('vc-label-b').textContent = r.b.label;
+  document.getElementById('vc-round').textContent = t.round + ' ' + (currentRound + 1) + ' ' + t.of + ' 5';
+  document.getElementById('vc-progress-bar').style.width = ((currentRound) / 5 * 100) + '%';
+}
+
+function showResult() {
+  const idx = choices.reduce((sum, c) => sum + c, 0) % vibes.length;
+  const vibe = vibes[idx];
+
+  document.getElementById('vc-options').classList.add('vc-hidden');
+  document.getElementById('vc-round').classList.add('vc-hidden');
+  document.getElementById('vc-progress').classList.add('vc-hidden');
+  document.getElementById('vc-result').classList.remove('vc-hidden');
+  document.getElementById('vc-result-emoji').textContent = vibe.emoji;
+  document.getElementById('vc-result-title').textContent = vibe.title;
+  document.getElementById('vc-result-desc').textContent = vibe.desc;
+  document.getElementById('vc-progress-bar').style.width = '100%';
+}
+
+function pick(choice) {
+  choices.push(choice);
+  currentRound++;
+  if (currentRound >= 5) {
+    showResult();
+  } else {
+    showRound();
+  }
+}
+
+document.getElementById('vc-opt-a').addEventListener('click', function() { pick(0); });
+document.getElementById('vc-opt-b').addEventListener('click', function() { pick(1); });
+
+showRound();
+</script>
+
+<style>
+  .vc-section {
+    padding: 48px 0;
+    font-family: 'Poppins', sans-serif;
+  }
+  .vc-container {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 36px 28px;
+    background: #fff;
+    border-radius: 24px;
+    border: 1px solid #f0e6f6;
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.08);
+    text-align: center;
+  }
+  .vc-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .vc-subtitle {
+    font-size: 0.92rem;
+    color: #999;
+    margin-bottom: 24px;
+    font-weight: 400;
+  }
+  .vc-progress {
+    width: 100%;
+    height: 6px;
+    background: #f3e8ff;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .vc-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ec4899, #a855f7, #f97316);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .vc-round {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .vc-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .vc-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 32px;
+    border-radius: 20px;
+    border: 2px solid #f0e6f6;
+    background: linear-gradient(135deg, #fef7ff, #fff5f7);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-width: 160px;
+    font-family: 'Poppins', sans-serif;
+  }
+  .vc-option:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(236, 72, 153, 0.15);
+    border-color: #ec4899;
+  }
+  .vc-option:active {
+    transform: scale(0.97);
+  }
+  .vc-option-a:hover {
+    border-color: #ec4899;
+    background: linear-gradient(135deg, #fce7f3, #fdf2f8);
+  }
+  .vc-option-b:hover {
+    border-color: #a855f7;
+    background: linear-gradient(135deg, #f3e8ff, #faf5ff);
+  }
+  .vc-emoji {
+    font-size: 2.8rem;
+  }
+  .vc-label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #555;
+  }
+  .vc-or {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ccc;
+    text-transform: uppercase;
+  }
+
+  /* Result */
+  .vc-result {
+    animation: vc-fadeIn 0.5s ease;
+  }
+  @keyframes vc-fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .vc-result-emoji {
+    font-size: 4rem;
+    margin-bottom: 12px;
+  }
+  .vc-result-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ec4899, #a855f7, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .vc-result-desc {
+    font-size: 0.92rem;
+    color: #777;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .vc-result-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .vc-btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-family: 'Poppins', sans-serif;
+  }
+  .vc-btn:hover {
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+  .vc-btn-share {
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3);
+  }
+  .vc-btn-share:hover {
+    box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+    color: #fff;
+  }
+  .vc-btn-again {
+    background: #fff;
+    color: #a855f7;
+    border: 2px solid #e8d5f5;
+  }
+  .vc-btn-again:hover {
+    background: #faf5ff;
+    border-color: #a855f7;
+    color: #a855f7;
+  }
+
+  .vc-hidden {
+    display: none !important;
+  }
+
+  @media (max-width: 500px) {
+    .vc-container {
+      padding: 28px 18px;
+    }
+    .vc-option {
+      min-width: 130px;
+      padding: 22px 20px;
+    }
+    .vc-emoji {
+      font-size: 2.2rem;
+    }
+    .vc-title {
+      font-size: 1.4rem;
+    }
+  }
+</style>

@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VibeCheck from "../../components/VibeCheck.astro";
+import TrendingNews from "../../components/TrendingNews.astro";
+---
+
+<BaseLayout
+  title="axsetrakb - Что в Тренде | Лайфстайл, Культура и Вирусные Новости"
+  description="Ваша ежедневная доза трендовых новостей, поп-культуры, моды, велнеса и вирусных моментов. Узнайте, что сейчас актуально."
+  lang="ru"
+>
+  <Fragment slot="logo">axsetrakb</Fragment>
+  <Fragment slot="footer-name">axsetrakb</Fragment>
+
+  <section class="hero">
+    <p class="hero-tag">✨ Ваша Ежедневная Доза Всего Трендового</p>
+    <h1>Что Сейчас в Тренде</h1>
+    <p>Поп-культура, мода, велнес, вирусные моменты и многое другое -- всё в одном месте. Будьте в курсе!</p>
+  </section>
+
+  <div class="ad-slot">Ad Space</div>
+
+  <VibeCheck lang="ru" />
+
+  <div class="ad-slot">Ad Space</div>
+
+  <TrendingNews lang="ru" />
+
+  <div class="ad-slot">Ad Space</div>
+</BaseLayout>
+
+<style>
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 18px;
+    position: relative;
+  }
+</style>

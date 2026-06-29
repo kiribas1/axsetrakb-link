@@ -1,0 +1,173 @@
+---
+import newsData from '../data/trending.json';
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const items = newsData.items[lang as keyof typeof newsData.items] || newsData.items.en;
+const week = newsData.week;
+
+const labels: Record<string, string> = {
+  en: 'Trending This Week',
+  es: 'Tendencias de la Semana',
+  zh: '本周热门',
+  ru: 'Тренды Недели',
+  pt: 'Tendencias da Semana',
+  ar: 'الرائج هذا الأسبوع',
+};
+
+const borderColors = [
+  '#ec4899', // pink
+  '#a855f7', // purple
+  '#f97316', // coral/orange
+  '#14b8a6', // teal
+  '#f472b6', // light pink
+  '#8b5cf6', // violet
+  '#fb923c', // orange
+  '#06b6d4', // cyan
+  '#e879f9', // fuchsia
+  '#34d399', // emerald
+];
+
+const gradientPairs = [
+  'linear-gradient(135deg, #ec4899, #f472b6)',
+  'linear-gradient(135deg, #a855f7, #c084fc)',
+  'linear-gradient(135deg, #f97316, #fb923c)',
+  'linear-gradient(135deg, #14b8a6, #34d399)',
+  'linear-gradient(135deg, #f472b6, #e879f9)',
+  'linear-gradient(135deg, #8b5cf6, #a78bfa)',
+  'linear-gradient(135deg, #fb923c, #fbbf24)',
+  'linear-gradient(135deg, #06b6d4, #22d3ee)',
+  'linear-gradient(135deg, #e879f9, #c084fc)',
+  'linear-gradient(135deg, #34d399, #6ee7b7)',
+];
+---
+
+<section class="tn-section">
+  <div class="tn-container">
+    <div class="tn-header">
+      <h2 class="tn-title">{labels[lang] || labels.en}</h2>
+      <span class="tn-week">{week}</span>
+    </div>
+    <div class="tn-list">
+      {items.map((item: { title: string; summary: string }, i: number) => (
+        <article class="tn-item" style={`border-left-color: ${borderColors[i % borderColors.length]};`}>
+          <div class="tn-num-wrap">
+            <span class="tn-num" style={`background: ${gradientPairs[i % gradientPairs.length]};`}>{i + 1}</span>
+          </div>
+          <div class="tn-content">
+            <h3 class="tn-item-title">{item.title}</h3>
+            <p class="tn-item-summary">{item.summary}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .tn-section {
+    padding: 48px 0;
+    font-family: 'Poppins', sans-serif;
+  }
+  .tn-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .tn-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .tn-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ec4899, #a855f7, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .tn-week {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #a855f7;
+    background: #f5f0ff;
+    border: 1px solid #e8d5f5;
+    padding: 6px 16px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+  .tn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .tn-item {
+    display: flex;
+    gap: 16px;
+    padding: 20px 22px;
+    background: #fff;
+    border: 1px solid #f0e6f6;
+    border-left: 4px solid #ec4899;
+    border-radius: 14px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .tn-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(168, 85, 247, 0.1);
+    border-color: #e0d0f0;
+  }
+  .tn-num-wrap {
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .tn-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .tn-content {
+    flex: 1;
+  }
+  .tn-item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .tn-item-summary {
+    font-size: 0.88rem;
+    color: #777;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .tn-title {
+      font-size: 1.4rem;
+    }
+    .tn-item {
+      padding: 16px;
+      gap: 12px;
+    }
+    .tn-num {
+      width: 30px;
+      height: 30px;
+      font-size: 0.8rem;
+    }
+  }
+</style>

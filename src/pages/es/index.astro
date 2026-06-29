@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VibeCheck from "../../components/VibeCheck.astro";
+import TrendingNews from "../../components/TrendingNews.astro";
+---
+
+<BaseLayout
+  title="axsetrakb - Que Esta de Moda | Estilo de Vida, Cultura y Noticias Virales"
+  description="Tu dosis diaria de noticias trending, cultura pop, moda, bienestar y momentos virales. Descubre lo que esta de moda."
+  lang="es"
+>
+  <Fragment slot="logo">axsetrakb</Fragment>
+  <Fragment slot="footer-name">axsetrakb</Fragment>
+
+  <section class="hero">
+    <p class="hero-tag">✨ Tu Dosis Diaria de Todo lo que Es Tendencia</p>
+    <h1>Que Esta de Moda Ahora</h1>
+    <p>Cultura pop, moda, bienestar, momentos virales y mas -- todo en un solo lugar. No te lo pierdas!</p>
+  </section>
+
+  <div class="ad-slot">Ad Space</div>
+
+  <VibeCheck lang="es" />
+
+  <div class="ad-slot">Ad Space</div>
+
+  <TrendingNews lang="es" />
+
+  <div class="ad-slot">Ad Space</div>
+</BaseLayout>
+
+<style>
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 18px;
+    position: relative;
+  }
+</style>

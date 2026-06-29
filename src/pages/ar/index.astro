@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VibeCheck from "../../components/VibeCheck.astro";
+import TrendingNews from "../../components/TrendingNews.astro";
+---
+
+<BaseLayout
+  title="axsetrakb - ما هو الرائج الآن | نمط الحياة والثقافة والأخبار الفيروسية"
+  description="جرعتك اليومية من الأخبار الرائجة والثقافة الشعبية والموضة والعافية واللحظات الفيروسية. اكتشف ما هو ساخن الآن."
+  lang="ar"
+>
+  <Fragment slot="logo">axsetrakb</Fragment>
+  <Fragment slot="footer-name">axsetrakb</Fragment>
+
+  <section class="hero">
+    <p class="hero-tag">✨ جرعتك اليومية من كل ما هو رائج</p>
+    <h1>ما هو الرائج الآن</h1>
+    <p>الثقافة الشعبية، الموضة، العافية، اللحظات الفيروسية والمزيد -- كل شيء في مكان واحد. ابقَ على اطلاع!</p>
+  </section>
+
+  <div class="ad-slot">Ad Space</div>
+
+  <VibeCheck lang="ar" />
+
+  <div class="ad-slot">Ad Space</div>
+
+  <TrendingNews lang="ar" />
+
+  <div class="ad-slot">Ad Space</div>
+</BaseLayout>
+
+<style>
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 18px;
+    position: relative;
+  }
+</style>
